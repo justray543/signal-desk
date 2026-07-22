@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Signal Desk</title>
+<title>Formosa</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -167,7 +167,7 @@ body,header,.kpi,.card,.scard,.atrack,.bar,.rsitrack,td,th,.stat div{transition:
 
 <header>
   <div class="wrap hrow">
-    <div class="mark">Signal&nbsp;Desk<span></span></div>
+    <div class="mark">Formosa<span></span></div>
     <div class="hmeta">
       <div class="pill" id="modepill">Paper</div>
       <div class="pill">IBKR / TWS</div>
@@ -191,7 +191,7 @@ body,header,.kpi,.card,.scard,.atrack,.bar,.rsitrack,td,th,.stat div{transition:
 <template id="tpl">
 <div class="hero">
   <div class="eyebrow" id="eyebrow"></div>
-  <h1><span id="hcount">Five</span> instruments, <em>one rule set</em>, checked every weekday at nine.</h1>
+  <h1><em>IBKR-executed</em> algorithmic system trading across global markets.</h1>
   <div class="incep" id="inceptionline"></div>
   <div class="kpis" id="kpis"></div>
 </div>
@@ -224,13 +224,13 @@ body,header,.kpi,.card,.scard,.atrack,.bar,.rsitrack,td,th,.stat div{transition:
 
 <section>
   <div class="shead"><h2>Open positions</h2>
-    <div class="note">Stop bar shows how far price has travelled from entry toward the 5% stop.</div></div>
+    <div class="note">Stop bar shows how far price has travelled from entry toward its stop level.</div></div>
   <div class="card revealable"><div class="scroll"><table id="positions"></table></div></div>
 </section>
 
 <section>
   <div class="shead"><h2>Signal state</h2>
-    <div class="note">Spread is (EMA9 &minus; EMA21) as a percentage of price, so instruments at different price levels compare directly. The shaded band is the 50&ndash;70 RSI entry window.</div></div>
+    <div class="note">Trend strength is normalised by price, so instruments at different price levels compare directly. The shaded band marks the momentum range where entries are considered.</div></div>
   <div class="sgrid revealable" id="signals"></div>
 </section>
 
@@ -281,7 +281,7 @@ body,header,.kpi,.card,.scard,.atrack,.bar,.rsitrack,td,th,.stat div{transition:
 
 <section>
   <div class="shead"><h2>Signal to fill</h2>
-    <div class="note">How many crossovers became positions, and what vetoed the rest.</div></div>
+    <div class="note">How many signals became positions, and what vetoed the rest.</div></div>
   <div class="grid3">
     <div class="card funnel revealable" id="funnel"></div>
     <div class="card revealable" style="padding:0"><div class="scroll"><table id="supptable"></table></div></div>
@@ -384,13 +384,7 @@ function header(){
 function hero(){
   const i=S.inception, c=cur();
   document.getElementById('eyebrow').textContent=
-    'EMA9 / EMA21 crossover, RSI confirmed \u00B7 '+S.signals.length+' instruments';
-  // Headline count follows the data rather than being hardcoded, so adding
-  // the equities to build_instruments() updates the page automatically.
-  const words=['Zero','One','Two','Three','Four','Five','Six','Seven','Eight',
-               'Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen'];
-  document.getElementById('hcount').textContent =
-    words[S.signals.length] || S.signals.length;
+    'Systematic trend following \u00B7 '+S.signals.length+' instruments \u00B7 paper capital';
   document.getElementById('inceptionline').innerHTML=
     'Live since <b>'+new Date(i.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})+
     '</b> \u00B7 <b>'+i.days_live+'</b> days \u00B7 opening capital <b class="mono">'+
@@ -578,7 +572,7 @@ function signals(){
     const armed=s.state==='armed';
     const tag=s.state==='long'?'<span class="tag long">Long</span>'
       :s.state==='armed'?'<span class="tag" style="border-color:var(--armedBorder);color:var(--armedInk)">Armed</span>'
-      :s.state==='blocked'?'<span class="tag" style="border-color:var(--blockBorder);color:var(--loss)">RSI block</span>'
+      :s.state==='blocked'?'<span class="tag" style="border-color:var(--blockBorder);color:var(--loss)">Filtered</span>'
       :'<span class="tag">Flat</span>';
     let expNote='';
     if(s.days_to_expiry!=null&&s.expiry_status!=='ok'){
@@ -590,11 +584,11 @@ function signals(){
       <div class="srow"><div class="sym">${esc(s.label)}</div>${tag}</div>
       <div class="px mono">${n(s.price)}</div>
       <div class="spread mono ${dir(s.spread_pct)}">${sgn(s.spread_pct)}${Math.abs(s.spread_pct).toFixed(2)}%</div>
-      <div class="slabel">EMA9 vs EMA21</div>
+      <div class="slabel">Trend strength</div>
       <div class="rsi">
         <div class="rsitrack"><div class="rsiband"></div>
           <div class="rsimark" style="left:${Math.min(100,Math.max(0,s.rsi))}%"></div></div>
-        <div class="rsifoot"><span>0</span><span class="mono" style="color:var(--ink)">RSI ${s.rsi.toFixed(1)}</span><span>100</span></div>
+        <div class="rsifoot"><span>0</span><span class="mono" style="color:var(--ink)">Momentum ${s.rsi.toFixed(0)}</span><span>100</span></div>
       </div>
       <div class="sfoot">${expNote||'<span></span>'}</div>
     </div>`));
@@ -739,14 +733,14 @@ function funnel(){
   const s=S.suppression;
   const taken=s.fill_rate, supp=100-taken;
   document.getElementById('funnel').innerHTML=
-    `<div class="k" style="font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)">Crossovers fired</div>
+    `<div class="k" style="font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)">Signals fired</div>
      <div class="mono" style="font-size:32px;letter-spacing:-.03em;margin-top:6px">${s.signals_fired}</div>
      <div class="fbar"><i class="ftaken" style="width:${taken}%"></i><i class="fsupp" style="width:${supp}%"></i></div>
      <div class="fleg"><span class="mono">${s.entries_taken} taken \u00B7 ${s.fill_rate}%</span><span class="mono">${s.suppressed} vetoed</span></div>
      <div class="note" style="margin-top:14px">${
        s.fill_rate<55
-       ? 'RSI is vetoing nearly half the crossovers. Worth ablating the RSI filter in backtest to see whether it adds alpha or just removes trades.'
-       : 'RSI is filtering a minority of crossovers.'}</div>`;
+       ? 'The confirmation filter is vetoing nearly half of all signals. Worth testing whether it adds return or only removes trades.'
+       : 'The confirmation filter is vetoing a minority of signals.'}</div>`;
 }
 function suppTable(){
   const t=document.getElementById('supptable');
@@ -775,7 +769,7 @@ function health(){
 function closed(){
   const t=document.getElementById('closed');
   if(!S.closed_trades.length){t.outerHTML='<div class="err">No closed trades yet.</div>';return}
-  const nice={stop:'Stop hit',crossover:'Crossover reversal',rsi_exit:'RSI below 40',manual:'Manual',roll:'Contract roll'};
+  const nice={stop:'Stop hit',crossover:'Trend reversal',rsi_exit:'Momentum fade',manual:'Manual',roll:'Contract roll'};
   t.innerHTML=`<thead><tr>
     <th>Instrument</th><th>Side</th><th>Opened</th><th>Closed</th>
     <th class="num">Held</th><th class="num">Entry</th><th class="num">Exit</th>

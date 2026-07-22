@@ -158,22 +158,52 @@ def export(nav, price_history, live_states, signal_snapshot,
     stats = metrics.trade_stats(trades)
 
     # ---- headline performance ----
+    #
+    # Return is a point-in-time ratio of NAV to starting capital, so it needs
+    # no history at all. Previously it was computed only when the equity
+    # series had two or more points, which meant a freshly started system
+    # reported +0.00% while the account was visibly up or down. Sharpe,
+    # Sortino, volatility, CAGR and drawdown genuinely require a return
+    # series, so those stay None until there is one and the dashboard shows
+    # a dash rather than a misleading zero.
+    current_nav = float(equity.iloc[-1]) if len(equity) else float(nav)
+
+    perf = {
+        "nav": round(current_nav, 2),
+        "return_pct": round((current_nav / start_cap - 1) * 100, 2) if start_cap else 0.0,
+        "pnl_abs": round(current_nav - start_cap, 2),
+        "history_points": int(len(equity)),
+    }
+
+    # Annualised figures on a handful of days are arithmetically valid and
+    # completely meaningless: three rising days produces a Sharpe above 100
+    # and a CAGR in the thousands of percent. Publishing that on a public
+    # dashboard would be worse than publishing nothing, so hold them back
+    # until the sample is large enough to be worth reading.
+    MIN_POINTS_RISK = 20     # ~1 month of weekdays for Sharpe/Sortino/vol
+    MIN_POINTS_CAGR = 60     # ~3 months before annualising a return
+
     if len(equity) >= 2:
-        perf = {
-            "nav": round(float(equity.iloc[-1]), 2),
-            "return_pct": round((float(equity.iloc[-1]) / start_cap - 1) * 100, 2),
-            "cagr_pct": round(metrics.cagr(equity) * 100, 2),
-            "sharpe": round(metrics.sharpe(equity), 2),
-            "sortino": round(metrics.sortino(equity), 2),
-            "volatility_pct": round(metrics.volatility(equity) * 100, 2),
-            "max_drawdown_pct": round(metrics.max_drawdown(equity) * 100, 2),
-        }
+        perf["max_drawdown_pct"] = round(metrics.max_drawdown(equity) * 100, 2)
     else:
-        perf = {
-            "nav": round(float(nav), 2),
-            "return_pct": 0.0, "cagr_pct": 0.0, "sharpe": 0.0,
-            "sortino": 0.0, "volatility_pct": 0.0, "max_drawdown_pct": 0.0,
-        }
+        perf["max_drawdown_pct"] = None
+
+    if len(equity) >= MIN_POINTS_RISK:
+        perf["sharpe"] = round(metrics.sharpe(equity), 2)
+        perf["sortino"] = round(metrics.sortino(equity), 2)
+        perf["volatility_pct"] = round(metrics.volatility(equity) * 100, 2)
+    else:
+        perf["sharpe"] = None
+        perf["sortino"] = None
+        perf["volatility_pct"] = None
+
+    if len(equity) >= MIN_POINTS_CAGR:
+        perf["cagr_pct"] = round(metrics.cagr(equity) * 100, 2)
+    else:
+        perf["cagr_pct"] = None
+
+    perf["min_points_risk"] = MIN_POINTS_RISK
+
 
     # ---- equity + underwater curves ----
     if len(equity) >= 2:

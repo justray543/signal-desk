@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-22T23:30:19",
+  "generated_at": "2026-07-22T23:33:10",
   "mode": "paper",
   "currency": "USD",
   "inception": {
@@ -8,7 +8,7 @@
     "days_live": 0
   },
   "performance": {
-    "nav": 1018755.64,
+    "nav": 1018784.53,
     "return_pct": 0.0,
     "cagr_pct": 0.0,
     "sharpe": 0.0,
@@ -37,11 +37,11 @@
       "label": "NQ",
       "venue": "CME",
       "quantity": 1,
-      "entry_price": 584072.24,
+      "entry_price": 29203.61,
       "current_price": 29165.0,
       "stop_price": 0.0,
-      "unrealised_pnl": -11098144.8,
-      "unrealised_pct": -95.01,
+      "unrealised_pnl": -772.24,
+      "unrealised_pct": -0.13,
       "entry_date": null,
       "holding_days": null,
       "stop_proximity_pct": 0.0,
@@ -52,11 +52,11 @@
       "label": "DAX",
       "venue": "EUREX",
       "quantity": 1,
-      "entry_price": 631777.0,
+      "entry_price": 25271.08,
       "current_price": 25272.0,
       "stop_price": 0.0,
-      "unrealised_pnl": -15162625.0,
-      "unrealised_pct": -96.0,
+      "unrealised_pnl": 23.0,
+      "unrealised_pct": 0.0,
       "entry_date": null,
       "holding_days": null,
       "stop_proximity_pct": 0.0,
@@ -67,11 +67,11 @@
       "label": "NKD",
       "venue": "CME",
       "quantity": 1,
-      "entry_price": 332953.01,
+      "entry_price": 66590.6,
       "current_price": 66380.0,
       "stop_price": 0.0,
-      "unrealised_pnl": -1332865.05,
-      "unrealised_pct": -80.06,
+      "unrealised_pnl": -1053.01,
+      "unrealised_pct": -0.32,
       "entry_date": null,
       "holding_days": null,
       "stop_proximity_pct": 0.0,
@@ -251,19 +251,43 @@
     }
   ],
   "suppression": {
-    "signals_fired": 4,
+    "signals_fired": 5,
     "entries_taken": 0,
-    "suppressed": 4,
+    "suppressed": 5,
     "fill_rate": 0.0,
     "by_reason": {
-      "rsi_overbought": 4
+      "rsi_overbought": 5
     },
     "by_label": {
-      "HSI": 4
+      "HSI": 5
     }
   },
   "closed_trades": [],
   "health": [
+    {
+      "event": "health",
+      "level": "warning",
+      "label": "NKD",
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T23:32:53",
+      "message": "position (1.0) not tracked locally, treating as MANUAL. Bot will not auto-sell it."
+    },
+    {
+      "event": "health",
+      "level": "warning",
+      "label": "DAX",
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T23:32:48",
+      "message": "position (1.0) not tracked locally, treating as MANUAL. Bot will not auto-sell it."
+    },
+    {
+      "event": "health",
+      "level": "warning",
+      "label": "NQ",
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T23:32:43",
+      "message": "position (1.0) not tracked locally, treating as MANUAL. Bot will not auto-sell it."
+    },
     {
       "event": "health",
       "level": "warning",
@@ -428,7 +452,7 @@
   "last_run": {
     "event": "run",
     "date": "2026-07-22",
-    "timestamp": "2026-07-22T23:30:19",
+    "timestamp": "2026-07-22T23:33:10",
     "status": "ok",
     "instruments_checked": 5,
     "errors": 0

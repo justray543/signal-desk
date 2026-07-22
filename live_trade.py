@@ -18,6 +18,19 @@ import position_ownership as owner
 
 STRATEGY = "daily_futures"
 
+# IBKR's updatePortfolio reports average_cost for FUTURES as the full
+# contract value (price x multiplier), not the per-point price. Adopting a
+# position without dividing gives an entry price 5x to 25x too high: NKD
+# showed 332953 instead of 66590. Every stop and P&L derived from it is
+# then wrong. Divide by the multiplier when adopting a futures position.
+CONTRACT_MULTIPLIERS = {
+    "NQ": 20,
+    "DAX": 25,
+    "NKD": 5,
+    "HSI": 50,
+    "SOXX": 1,
+}
+
 LOG_FILE = "multi_trade_log.txt"
 
 RSI_ENTRY_MIN = 50
@@ -142,7 +155,28 @@ def compute_signal(prices, rsi_window=14):
     return ema9.iloc[-1], ema21.iloc[-1], rsi.iloc[-1]
 
 
-def reconcile_state(label, state_file, real_positions):
+def normalise_avg_cost(label, raw_avg_cost, contract):
+    """
+    Convert IBKR's average_cost into a per-point entry price.
+
+    Stocks report average_cost per share, so they pass through unchanged.
+    Futures report it as the whole contract value, so divide by the
+    multiplier. Returns 0.0 on nonsense input rather than guessing.
+    """
+    if raw_avg_cost is None or raw_avg_cost <= 0:
+        return 0.0
+
+    if contract.secType != "FUT":
+        return float(raw_avg_cost)
+
+    multiplier = CONTRACT_MULTIPLIERS.get(label, 1)
+    if multiplier <= 0:
+        return float(raw_avg_cost)
+
+    return float(raw_avg_cost) / multiplier
+
+
+def reconcile_state(label, state_file, real_positions, contract=None):
     state = load_state(state_file)
     local_position = state["position"]
 
@@ -163,11 +197,20 @@ def reconcile_state(label, state_file, real_positions):
         return load_state(state_file)
 
     if local_position == 0 and broker_has_position:
+        entry_px = real_avg_cost
+        if contract is not None:
+            entry_px = normalise_avg_cost(label, real_avg_cost, contract)
+            if contract.secType == "FUT" and entry_px != real_avg_cost:
+                log(label + ": normalised broker avg_cost " +
+                    str(round(real_avg_cost, 2)) + " to per-point " +
+                    str(round(entry_px, 2)) + " (multiplier " +
+                    str(CONTRACT_MULTIPLIERS.get(label, 1)) + ")")
+
         message = ("position (" + str(real_qty) + ") not tracked locally, "
                    "treating as MANUAL. Bot will not auto-sell it.")
         log(label + ": " + message)
         ledger.record_health("warning", label, message)
-        save_state(state_file, 1, real_avg_cost, 0.0, int(abs(real_qty)), True)
+        save_state(state_file, 1, entry_px, 0.0, int(abs(real_qty)), True)
         return load_state(state_file)
 
     return state
@@ -180,7 +223,7 @@ def process_instrument(app, label, config, request_id, real_positions):
 
     log("--- Checking " + label + " ---")
 
-    state = reconcile_state(label, state_file, real_positions)
+    state = reconcile_state(label, state_file, real_positions, contract)
 
     what_to_show = "MIDPOINT"
     if contract.secType == "FUT":

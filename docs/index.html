@@ -190,7 +190,7 @@ body,header,.kpi,.card,.scard,.atrack,.bar,.rsitrack,td,th,.stat div{transition:
 <template id="tpl">
 <div class="hero">
   <div class="eyebrow" id="eyebrow"></div>
-  <h1>Thirteen instruments, <em>one rule set</em>, checked every weekday at nine.</h1>
+  <h1><span id="hcount">Five</span> instruments, <em>one rule set</em>, checked every weekday at nine.</h1>
   <div class="incep" id="inceptionline"></div>
   <div class="kpis" id="kpis"></div>
 </div>
@@ -328,6 +328,8 @@ const pct=v=>sgn(v)+Math.abs(v).toFixed(2)+'%';
 const dir=v=>v>=0?'up':'dn';
 const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 const shortDate=s=>{const d=new Date(s);return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})};
+const SYMBOLS={EUR:'\u20AC',USD:'$',GBP:'\u00A3',JPY:'\u00A5',CHF:'CHF\u00A0',HKD:'HK$',AUD:'A$',CAD:'C$'};
+const cur=()=>SYMBOLS[S.currency]||(S.currency?S.currency+'\u00A0':'');
 
 let S=null;
 
@@ -379,9 +381,15 @@ function header(){
 
 /* ---------- hero ---------- */
 function hero(){
-  const i=S.inception, c=S.currency==='EUR'?'\u20AC':'';
+  const i=S.inception, c=cur();
   document.getElementById('eyebrow').textContent=
     'EMA9 / EMA21 crossover, RSI confirmed \u00B7 '+S.signals.length+' instruments';
+  // Headline count follows the data rather than being hardcoded, so adding
+  // the equities to build_instruments() updates the page automatically.
+  const words=['Zero','One','Two','Three','Four','Five','Six','Seven','Eight',
+               'Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen'];
+  document.getElementById('hcount').textContent =
+    words[S.signals.length] || S.signals.length;
   document.getElementById('inceptionline').innerHTML=
     'Live since <b>'+new Date(i.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})+
     '</b> \u00B7 <b>'+i.days_live+'</b> days \u00B7 opening capital <b class="mono">'+
@@ -390,7 +398,7 @@ function hero(){
 
 /* ---------- KPIs ---------- */
 function kpis(){
-  const p=S.performance,t=S.trade_stats,c=S.currency==='EUR'?'\u20AC':'';
+  const p=S.performance,t=S.trade_stats,c=cur();
   const dd=S.drawdown_detail||{};
   const items=[
     {k:'Net asset value',v:c+Math.round(p.nav).toLocaleString('en-GB'),

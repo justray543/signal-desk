@@ -331,6 +331,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const shortDate=s=>{const d=new Date(s);return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})};
 const SYMBOLS={EUR:'\u20AC',USD:'$',GBP:'\u00A3',JPY:'\u00A5',CHF:'CHF\u00A0',HKD:'HK$',AUD:'A$',CAD:'C$'};
 const cur=()=>SYMBOLS[S.currency]||(S.currency?S.currency+'\u00A0':'');
+const plural=(n,w)=>n+' '+w+(n===1?'':'s');
 
 let S=null;
 
@@ -387,7 +388,7 @@ function hero(){
     'Systematic trend following \u00B7 '+S.signals.length+' instruments \u00B7 paper capital';
   document.getElementById('inceptionline').innerHTML=
     'Live since <b>'+new Date(i.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})+
-    '</b> \u00B7 <b>'+i.days_live+'</b> days \u00B7 opening capital <b class="mono">'+
+    '</b> \u00B7 <b>'+i.days_live+'</b> '+(i.days_live===1?'day':'days')+' \u00B7 opening capital <b class="mono">'+
     c+i.starting_capital.toLocaleString('en-GB')+'</b>';
 }
 
@@ -413,7 +414,7 @@ function kpis(){
         : 'Sortino '+f(p.sortino,2)+' \u00B7 vol '+f(p.volatility_pct,1,'%'),c:''},
     {k:'Max drawdown',v:f(p.max_drawdown_pct,2,'%'),
      s: (p.max_drawdown_pct==null? 'no history yet'
-        : (dd && dd.longest_underwater_days!=null? dd.longest_underwater_days+' days underwater':'')),
+        : (dd && dd.longest_underwater_days!=null? plural(dd.longest_underwater_days,'day')+' underwater':'')),
      c: p.max_drawdown_pct==null? '' : 'dn'},
     {k:'Win rate',v:t.count? t.win_rate.toFixed(1)+'%' : DASH,
      s:t.count+' closed \u00B7 payoff '+(t.payoff_ratio??DASH),c:''},

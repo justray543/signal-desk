@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-22T23:13:29",
+  "generated_at": "2026-07-22T23:30:19",
   "mode": "paper",
   "currency": "USD",
   "inception": {
@@ -8,7 +8,7 @@
     "days_live": 0
   },
   "performance": {
-    "nav": 1019018.53,
+    "nav": 1018755.64,
     "return_pct": 0.0,
     "cagr_pct": 0.0,
     "sharpe": 0.0,
@@ -34,6 +34,36 @@
   "markers": [],
   "positions": [
     {
+      "label": "NQ",
+      "venue": "CME",
+      "quantity": 1,
+      "entry_price": 584072.24,
+      "current_price": 29165.0,
+      "stop_price": 0.0,
+      "unrealised_pnl": -11098144.8,
+      "unrealised_pct": -95.01,
+      "entry_date": null,
+      "holding_days": null,
+      "stop_proximity_pct": 0.0,
+      "days_to_expiry": 70,
+      "expiry_status": "ok"
+    },
+    {
+      "label": "DAX",
+      "venue": "EUREX",
+      "quantity": 1,
+      "entry_price": 631777.0,
+      "current_price": 25272.0,
+      "stop_price": 0.0,
+      "unrealised_pnl": -15162625.0,
+      "unrealised_pct": -96.0,
+      "entry_date": null,
+      "holding_days": null,
+      "stop_proximity_pct": 0.0,
+      "days_to_expiry": 70,
+      "expiry_status": "ok"
+    },
+    {
       "label": "NKD",
       "venue": "CME",
       "quantity": 1,
@@ -57,7 +87,7 @@
       "ema21": 29532.32,
       "rsi": 40.1,
       "spread_pct": -0.802,
-      "state": "flat",
+      "state": "long",
       "days_to_expiry": 70,
       "expiry_status": "ok",
       "inception_date": "2026-07-22"
@@ -69,7 +99,7 @@
       "ema21": 25160.15,
       "rsi": 40.29,
       "spread_pct": -0.078,
-      "state": "flat",
+      "state": "long",
       "days_to_expiry": 70,
       "expiry_status": "ok",
       "inception_date": "2026-07-22"
@@ -221,19 +251,35 @@
     }
   ],
   "suppression": {
-    "signals_fired": 3,
+    "signals_fired": 4,
     "entries_taken": 0,
-    "suppressed": 3,
+    "suppressed": 4,
     "fill_rate": 0.0,
     "by_reason": {
-      "rsi_overbought": 3
+      "rsi_overbought": 4
     },
     "by_label": {
-      "HSI": 3
+      "HSI": 4
     }
   },
   "closed_trades": [],
   "health": [
+    {
+      "event": "health",
+      "level": "warning",
+      "label": "DAX",
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T23:29:57",
+      "message": "position (1.0) not tracked locally, treating as MANUAL. Bot will not auto-sell it."
+    },
+    {
+      "event": "health",
+      "level": "warning",
+      "label": "NQ",
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T23:29:51",
+      "message": "position (1.0) not tracked locally, treating as MANUAL. Bot will not auto-sell it."
+    },
     {
       "event": "health",
       "level": "warning",
@@ -382,7 +428,7 @@
   "last_run": {
     "event": "run",
     "date": "2026-07-22",
-    "timestamp": "2026-07-22T23:13:28",
+    "timestamp": "2026-07-22T23:30:19",
     "status": "ok",
     "instruments_checked": 5,
     "errors": 0

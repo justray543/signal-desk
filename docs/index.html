@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Signal Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7F6F2; --ink:#111111; --dark:#0D0D0D; --onDark:#FFFFFF;
+  --darkRule:#2A2A2E; --darkMuted:#8E8E96;
+  --accent:#E8F09B; --accentInk:#3D4416;
+  --slate:#5B7FA6; --rule:#DCDAE4; --hair:#EFEEEA; --muted:#8A8A94;
+  --loss:#A6483C; --gain:#4E6B1F; --card:#FFFFFF; --track:#EDECE8;
+  --gridline:#EDECE8; --axis:#8A8A94; --line:#111111;
+  --armedBg:#FCFDF3; --armedBorder:#C8D46E; --armedInk:#5C6620;
+  --blockBorder:#E0C4C0; --zero:#C9C7C0; --areaTop:.55;
+  --warn:#B5852E; --warnBg:#FBF4E4;
+  --corrPos:#5B7FA6; --corrNeg:#A6483C;
+}
+[data-theme="dark"]{
+  --bg:#0D0D0D; --ink:#EDECE8; --dark:#F7F6F2; --onDark:#111111;
+  --darkRule:#DCDAE4; --darkMuted:#6E6E76;
+  --accent:#C3CC72; --accentInk:#14170A;
+  --slate:#7FA0C4; --rule:#26262A; --hair:#1D1D20; --muted:#7E7E88;
+  --loss:#D07567; --gain:#A9C46A; --card:#161618; --track:#242428;
+  --gridline:#1F1F23; --axis:#6E6E76; --line:#EDECE8;
+  --armedBg:#1A1D12; --armedBorder:#4A5223; --armedInk:#C3CC72;
+  --blockBorder:#4A2E2A; --zero:#3A3A40; --areaTop:.28;
+  --warn:#D8A950; --warnBg:#231C0E;
+  --corrPos:#7FA0C4; --corrNeg:#D07567;
+}
+html{color-scheme:light}
+[data-theme="dark"]{color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'Space Grotesk',system-ui,sans-serif;line-height:1.5;padding-bottom:80px}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+
+header{background:var(--dark);position:sticky;top:0;z-index:50}
+.hrow{display:flex;align-items:center;justify-content:space-between;height:68px;gap:16px}
+.mark{color:var(--onDark);font-size:26px;font-weight:700;letter-spacing:-.04em;display:flex;align-items:center;gap:10px;white-space:nowrap}
+.mark span{width:10px;height:10px;background:var(--accent);border-radius:2px}
+.hmeta{display:flex;align-items:center;gap:10px;color:var(--darkMuted);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.pill{border:1px solid var(--darkRule);border-radius:100px;padding:5px 12px;color:var(--darkMuted);white-space:nowrap}
+.pill.live{color:var(--accent);border-color:var(--armedBorder)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:7px;vertical-align:1px}
+.dot.stale{background:var(--loss)}
+.themebtn{display:inline-flex;align-items:center;gap:8px;background:none;border:1px solid var(--darkRule);border-radius:100px;padding:5px 13px 5px 11px;cursor:pointer;color:var(--darkMuted);font-family:inherit;font-size:12px;letter-spacing:.06em;text-transform:uppercase;transition:color .18s,border-color .18s}
+.themebtn:hover{color:var(--accent);border-color:var(--armedBorder)}
+.themebtn svg{display:block}
+.themebtn .ic-moon{display:none}
+[data-theme="dark"] .themebtn .ic-sun{display:none}
+[data-theme="dark"] .themebtn .ic-moon{display:block}
+
+.hero{padding:56px 0 40px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:22px}
+h1{font-size:clamp(36px,6.4vw,64px);font-weight:300;letter-spacing:-.035em;line-height:1.03;max-width:17ch}
+h1 em{font-style:normal;background:var(--accent);color:var(--accentInk);padding:0 .08em;border-radius:3px}
+.incep{margin-top:20px;font-size:13px;color:var(--muted)}
+.incep b{color:var(--ink);font-weight:500}
+
+.kpis{display:grid;gap:1px;background:var(--rule);grid-template-columns:repeat(5,1fr);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);margin-top:44px}
+.kpi{background:var(--bg);padding:20px 18px 22px}
+.kpi .k{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.kpi .v{font-size:clamp(22px,2.7vw,32px);font-weight:400;letter-spacing:-.03em;margin-top:9px;line-height:1}
+.kpi .s{font-size:11px;color:var(--muted);margin-top:7px}
+.up{color:var(--gain)} .dn{color:var(--loss)} .wn{color:var(--warn)}
+
+section{padding:52px 0 0}
+.shead{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+h2{font-size:clamp(24px,3.2vw,34px);font-weight:300;letter-spacing:-.03em}
+.note{font-size:12px;color:var(--muted);letter-spacing:.03em;max-width:56ch}
+
+.card{background:var(--card);border:1px solid var(--rule);border-radius:16px}
+.chartcard{padding:20px 20px 10px}
+.legend{display:flex;gap:18px;font-size:12px;color:var(--muted);margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.legend i{width:14px;height:2px;display:inline-block;margin-right:7px;vertical-align:4px}
+.legend .mk{width:9px;height:9px;border-radius:50%;vertical-align:0}
+svg{display:block;width:100%;height:auto}
+
+.grid2{display:grid;gap:16px;grid-template-columns:1fr 1fr}
+.grid3{display:grid;gap:16px;grid-template-columns:2fr 1fr}
+
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:760px}
+th{text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;padding:13px 15px;border-bottom:1px solid var(--rule);white-space:nowrap}
+td{padding:12px 15px;border-bottom:1px solid var(--hair);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+.num,th.num{text-align:right}
+.sym{font-weight:500;letter-spacing:-.01em}
+.tag{font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:100px;border:1px solid var(--rule);color:var(--muted);display:inline-block}
+.tag.long{background:var(--accent);border-color:var(--armedBorder);color:var(--accentInk)}
+.tag.warn{border-color:var(--warn);color:var(--warn);background:var(--warnBg)}
+.tag.crit{border-color:var(--loss);color:var(--loss)}
+
+.bar{width:70px;height:4px;background:var(--track);border-radius:2px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:8px}
+.bar i{display:block;height:100%;background:var(--slate)}
+.bar i.hot{background:var(--loss)}
+
+.sgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.scard{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:15px}
+.scard.armed{border-color:var(--armedBorder);background:var(--armedBg)}
+.srow{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.scard .sym{font-size:15px}
+.px{font-size:12px;color:var(--muted);margin-top:2px}
+.spread{font-size:21px;margin-top:12px;letter-spacing:-.02em}
+.slabel{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.rsi{margin-top:12px}
+.rsitrack{position:relative;height:5px;background:var(--track);border-radius:3px}
+.rsiband{position:absolute;top:0;bottom:0;left:50%;width:20%;background:var(--accent);border-radius:3px}
+.rsimark{position:absolute;top:-3px;width:2px;height:11px;background:var(--line);border-radius:1px}
+.rsifoot{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:5px}
+.sfoot{margin-top:11px;padding-top:9px;border-top:1px solid var(--hair);font-size:10px;color:var(--muted);display:flex;justify-content:space-between;gap:6px}
+
+.attr{display:grid;gap:9px}
+.arow{display:grid;grid-template-columns:70px 1fr 96px 60px;align-items:center;gap:12px;font-size:13px}
+.atrack{height:22px;background:var(--track);border-radius:4px;position:relative;overflow:hidden}
+.atrack i{position:absolute;top:0;bottom:0;background:var(--slate);border-radius:4px}
+.atrack i.neg{background:var(--loss)}
+.azero{position:absolute;top:0;bottom:0;width:1px;background:var(--zero)}
+
+.corrwrap{overflow-x:auto}
+.corr{border-collapse:collapse;font-size:10px;min-width:auto}
+.corr td,.corr th{padding:0;border:none;white-space:nowrap}
+.corr th{font-size:9px;letter-spacing:.04em;color:var(--muted);font-weight:500;text-transform:none}
+.corr th.rowh{text-align:right;padding-right:8px}
+.corr th.colh{height:52px;vertical-align:bottom;padding-bottom:6px}
+.corr th.colh span{display:inline-block;writing-mode:vertical-rl;transform:rotate(180deg)}
+.cell{width:26px;height:26px;text-align:center;vertical-align:middle;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:9px}
+
+.hlist{display:grid}
+.hrowe{display:grid;grid-template-columns:76px 88px 1fr;gap:12px;align-items:start;padding:12px 15px;border-bottom:1px solid var(--hair);font-size:12.5px}
+.hrowe:last-child{border-bottom:none}
+.lvl{font-size:9px;letter-spacing:.09em;text-transform:uppercase;padding:2px 7px;border-radius:100px;border:1px solid var(--rule);color:var(--muted);text-align:center}
+.lvl.error{border-color:var(--loss);color:var(--loss)}
+.lvl.warning{border-color:var(--warn);color:var(--warn)}
+.hmsg{color:var(--muted);white-space:normal}
+
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);border-radius:12px;overflow:hidden;border:1px solid var(--rule)}
+.stat div{background:var(--card);padding:13px 15px}
+.stat .k{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.stat .v{font-size:19px;margin-top:5px;letter-spacing:-.02em}
+
+.funnel{padding:18px 20px}
+.fbar{height:30px;border-radius:5px;display:flex;overflow:hidden;margin:14px 0 10px}
+.fbar i{display:block;height:100%}
+.ftaken{background:var(--accent)}
+.fsupp{background:var(--track)}
+.fleg{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+
+footer{margin-top:60px;border-top:1px solid var(--rule);padding:26px 0 0;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
+.err{padding:40px 24px;text-align:center;color:var(--muted);font-size:14px}
+
+body,header,.kpi,.card,.scard,.atrack,.bar,.rsitrack,td,th,.stat div{transition:background-color .22s,border-color .22s,color .22s}
+@media(max-width:980px){.grid2,.grid3{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:660px){.kpis{grid-template-columns:repeat(2,1fr)}.wrap{padding:0 16px}.hmeta .pill:not(.live){display:none}.arow{grid-template-columns:56px 1fr 82px 48px;font-size:12px}.hrowe{grid-template-columns:64px 1fr;gap:8px}.hrowe .hdate{display:none}}
+@media(prefers-reduced-motion:no-preference){.revealable{opacity:0;transform:translateY(14px);transition:opacity .6s,transform .6s}.revealable.in{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+:focus-visible{outline:2px solid var(--slate);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hrow">
+    <div class="mark">Signal&nbsp;Desk<span></span></div>
+    <div class="hmeta">
+      <div class="pill" id="modepill">Paper</div>
+      <div class="pill">IBKR / TWS</div>
+      <div class="pill live" id="freshness"><span class="dot"></span>Loading</div>
+      <button class="themebtn" id="themebtn" type="button" aria-pressed="false">
+        <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+          <g class="ic-sun" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+            <circle cx="12" cy="12" r="4.2"/>
+            <path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6"/>
+          </g>
+          <path class="ic-moon" d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2z" fill="currentColor"/>
+        </svg>
+        <span id="themelabel">Dark</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap" id="app"><div class="err">Loading state.json…</div></div>
+
+<template id="tpl">
+<div class="hero">
+  <div class="eyebrow" id="eyebrow"></div>
+  <h1>Thirteen instruments, <em>one rule set</em>, checked every weekday at nine.</h1>
+  <div class="incep" id="inceptionline"></div>
+  <div class="kpis" id="kpis"></div>
+</div>
+
+<section>
+  <div class="shead"><h2>Equity</h2>
+    <div class="note">Against equal-weight buy-and-hold on the same instruments, which isolates what the timing rules add. Dots mark entries and exits.</div></div>
+  <div class="card chartcard revealable">
+    <div class="legend">
+      <div><i style="background:var(--line)"></i>Strategy</div>
+      <div><i style="background:var(--slate)"></i>Buy and hold</div>
+      <div><i class="mk" style="background:var(--armedInk)"></i>Entry</div>
+      <div><i class="mk" style="background:var(--gain)"></i>Winning exit</div>
+      <div><i class="mk" style="background:var(--loss)"></i>Losing exit</div>
+    </div>
+    <div id="equity"></div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><h2>Underwater</h2>
+    <div class="note">Distance below the running peak. A single max-drawdown figure hides whether you were down for two days or four months.</div></div>
+  <div class="grid3">
+    <div class="card chartcard revealable"><div id="underwater"></div></div>
+    <div class="card revealable" style="padding:18px 20px">
+      <div class="stat" id="ddstat"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><h2>Open positions</h2>
+    <div class="note">Stop bar shows how far price has travelled from entry toward the 5% stop.</div></div>
+  <div class="card revealable"><div class="scroll"><table id="positions"></table></div></div>
+</section>
+
+<section>
+  <div class="shead"><h2>Signal state</h2>
+    <div class="note">Spread is (EMA9 &minus; EMA21) as a percentage of price, so instruments at different price levels compare directly. The shaded band is the 50&ndash;70 RSI entry window.</div></div>
+  <div class="sgrid revealable" id="signals"></div>
+</section>
+
+<section>
+  <div class="shead"><h2>Correlation</h2>
+    <div class="note">Daily-return correlation over the last 120 days. This is the test of the diversification claim.</div></div>
+  <div class="grid3">
+    <div class="card revealable" style="padding:20px"><div class="corrwrap"><table class="corr" id="corr"></table></div></div>
+    <div class="card revealable" style="padding:18px 20px">
+      <div class="stat" id="corrstat"></div>
+      <div class="note" id="corrverdict" style="margin-top:14px"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><h2>Attribution</h2>
+    <div class="note">Realised P&amp;L by instrument, closed trades only.</div></div>
+  <div class="attr revealable" id="attr"></div>
+</section>
+
+<section>
+  <div class="shead"><h2>Rolling performance</h2>
+    <div class="note">60-day Sharpe and 20-trade win rate. Inception-to-date figures on a short paper run are mostly noise.</div></div>
+  <div class="grid2">
+    <div class="card chartcard revealable">
+      <div class="legend"><div><i style="background:var(--line)"></i>60-day Sharpe</div></div>
+      <div id="rollsharpe"></div>
+    </div>
+    <div class="card chartcard revealable">
+      <div class="legend"><div><i style="background:var(--slate)"></i>20-trade win rate</div></div>
+      <div id="rollwin"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><h2>Holding periods</h2>
+    <div class="note">Wins and losses by duration. If the winning bucket is not clearly to the right of the losing one, the exit rule is cutting the trades meant to pay for everything else.</div></div>
+  <div class="grid2">
+    <div class="card chartcard revealable">
+      <div class="legend"><div><i style="background:var(--armedBorder)"></i>Wins</div><div><i style="background:var(--loss)"></i>Losses</div></div>
+      <div id="durations"></div>
+    </div>
+    <div class="card revealable" style="padding:18px 20px"><div class="stat" id="tradestat"></div></div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><h2>Signal to fill</h2>
+    <div class="note">How many crossovers became positions, and what vetoed the rest.</div></div>
+  <div class="grid3">
+    <div class="card funnel revealable" id="funnel"></div>
+    <div class="card revealable" style="padding:0"><div class="scroll"><table id="supptable"></table></div></div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><h2>Run health</h2>
+    <div class="note">State mismatches, exceptions and blocked instruments from recent runs.</div></div>
+  <div class="card revealable"><div class="hlist" id="health"></div></div>
+</section>
+
+<section>
+  <div class="shead"><h2>Closed trades</h2><div class="note">Most recent first.</div></div>
+  <div class="card revealable"><div class="scroll"><table id="closed"></table></div></div>
+</section>
+
+<footer>
+  <div id="footnote"></div>
+  <div class="mono" id="footstamp"></div>
+</footer>
+</template>
+
+<script>
+/* ---------- theme (before render so charts read correct tokens) ---------- */
+const TK='signaldesk.theme';
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  const b=document.getElementById('themebtn');
+  b.setAttribute('aria-pressed',t==='dark');
+  b.setAttribute('aria-label',t==='dark'?'Switch to light theme':'Switch to dark theme');
+  document.getElementById('themelabel').textContent=t==='dark'?'Light':'Dark';
+}
+let theme=localStorage.getItem(TK)||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+applyTheme(theme);
+
+/* ---------- helpers ---------- */
+const cs=()=>getComputedStyle(document.documentElement);
+const C=k=>cs().getPropertyValue(k).trim();
+const el=h=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild};
+const n=(v,d=2)=>Number(v).toLocaleString('en-GB',{minimumFractionDigits:d,maximumFractionDigits:d});
+const sgn=v=>(v<0?'\u2212':'+');
+const money=(v,c='')=>sgn(v)+c+Math.abs(v).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pct=v=>sgn(v)+Math.abs(v).toFixed(2)+'%';
+const dir=v=>v>=0?'up':'dn';
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const shortDate=s=>{const d=new Date(s);return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})};
+
+let S=null;
+
+/* ---------- boot ---------- */
+(async function(){
+  try{
+    const r=await fetch('state.json',{cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    S=await r.json();
+  }catch(e){
+    document.getElementById('app').innerHTML=
+      '<div class="err">Could not load <span class="mono">state.json</span>. '+
+      'The exporter writes it at the end of each run.<br>'+esc(e.message)+'</div>';
+    return;
+  }
+  document.getElementById('app').innerHTML='';
+  document.getElementById('app').appendChild(
+    document.getElementById('tpl').content.cloneNode(true));
+  renderAll();
+  wireTheme();
+  reveal();
+})();
+
+function renderAll(){
+  header(); hero(); kpis();
+  drawEquity(); drawUnderwater(); ddStats();
+  positions(); signals(); correlation(); attribution();
+  drawRollingSharpe(); drawRollingWin(); drawDurations(); tradeStats();
+  funnel(); suppTable(); health(); closed(); foot();
+}
+
+/* ---------- header ---------- */
+function header(){
+  document.getElementById('modepill').textContent =
+    S.mode==='paper' ? 'Paper' : 'Live capital';
+  const last=S.last_run||{};
+  const stamp=new Date(S.generated_at);
+  const ageH=(Date.now()-stamp)/36e5;
+  const f=document.getElementById('freshness');
+  if(ageH>26){
+    f.className='pill';
+    f.innerHTML='<span class="dot stale"></span>Stale, '+Math.floor(ageH)+'h old';
+  }else{
+    f.className='pill live';
+    f.innerHTML='<span class="dot"></span>'+
+      stamp.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+' CEST';
+  }
+}
+
+/* ---------- hero ---------- */
+function hero(){
+  const i=S.inception, c=S.currency==='EUR'?'\u20AC':'';
+  document.getElementById('eyebrow').textContent=
+    'EMA9 / EMA21 crossover, RSI confirmed \u00B7 '+S.signals.length+' instruments';
+  document.getElementById('inceptionline').innerHTML=
+    'Live since <b>'+new Date(i.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})+
+    '</b> \u00B7 <b>'+i.days_live+'</b> days \u00B7 opening capital <b class="mono">'+
+    c+i.starting_capital.toLocaleString('en-GB')+'</b>';
+}
+
+/* ---------- KPIs ---------- */
+function kpis(){
+  const p=S.performance,t=S.trade_stats,c=S.currency==='EUR'?'\u20AC':'';
+  const dd=S.drawdown_detail||{};
+  const items=[
+    {k:'Net asset value',v:c+Math.round(p.nav).toLocaleString('en-GB'),
+     s:pct(p.return_pct)+' since inception',c:dir(p.return_pct)},
+    {k:'Sharpe',v:p.sharpe.toFixed(2),
+     s:'Sortino '+p.sortino.toFixed(2)+' \u00B7 vol '+p.volatility_pct.toFixed(1)+'%',c:''},
+    {k:'Max drawdown',v:p.max_drawdown_pct.toFixed(2)+'%',
+     s:dd.longest_underwater_days!=null?dd.longest_underwater_days+' days underwater':'',c:'dn'},
+    {k:'Win rate',v:t.win_rate.toFixed(1)+'%',
+     s:t.count+' closed \u00B7 payoff '+(t.payoff_ratio??'\u2013'),c:''},
+    {k:'Effective bets',v:S.correlation.effective_bets.toFixed(1),
+     s:'of '+S.correlation.instrument_count+' instruments',
+     c:S.correlation.effective_bets < S.correlation.instrument_count*0.5?'wn':''}
+  ];
+  const w=document.getElementById('kpis');
+  items.forEach(i=>w.appendChild(el(
+    `<div class="kpi"><div class="k">${i.k}</div>
+     <div class="v mono ${i.c}">${i.v}</div>
+     <div class="s mono">${i.s}</div></div>`)));
+}
+
+/* ---------- equity + markers ---------- */
+function drawEquity(){
+  const E=S.equity;
+  if(!E.dates.length){document.getElementById('equity').innerHTML='<div class="err">No equity history yet.</div>';return}
+  const W=1000,H=320,P={t:18,r:18,b:36,l:64};
+  const a=E.strategy, b=E.benchmark.map(v=>v==null?NaN:v);
+  const all=a.concat(b.filter(v=>!isNaN(v)));
+  const lo=Math.min(...all), hi=Math.max(...all);
+  const pad=(hi-lo)*0.08||1;
+  const LO=lo-pad, HI=hi+pad;
+  const X=i=>P.l+i*(W-P.l-P.r)/Math.max(1,a.length-1);
+  const Y=v=>P.t+(HI-v)*(H-P.t-P.b)/(HI-LO);
+  const line=arr=>arr.map((v,i)=>isNaN(v)?null:(i===0||isNaN(arr[i-1])?'M':'L')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).filter(Boolean).join(' ');
+  const area=line(a)+` L ${X(a.length-1).toFixed(1)} ${Y(LO)} L ${X(0).toFixed(1)} ${Y(LO)} Z`;
+
+  let grid='',ticks='';
+  for(let k=0;k<=4;k++){
+    const v=LO+(HI-LO)*k/4;
+    grid+=`<line x1="${P.l}" y1="${Y(v)}" x2="${W-P.r}" y2="${Y(v)}" stroke="${C('--gridline')}"/>`;
+    ticks+=`<text x="${P.l-10}" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="${C('--axis')}" font-family="JetBrains Mono,monospace">${Math.round(v/1000)}k</text>`;
+  }
+  let xl='';
+  const step=Math.max(1,Math.floor(E.dates.length/6));
+  for(let i=0;i<E.dates.length;i+=step){
+    xl+=`<text x="${X(i)}" y="${H-12}" text-anchor="middle" font-size="11" fill="${C('--axis')}" font-family="Space Grotesk,sans-serif">${shortDate(E.dates[i])}</text>`;
+  }
+
+  const idx={}; E.dates.forEach((d,i)=>idx[d]=i);
+  let mk='';
+  (S.markers||[]).forEach(m=>{
+    const i=idx[m.date]; if(i===undefined) return;
+    const y=Y(a[i]);
+    if(m.type==='entry'){
+      mk+=`<circle cx="${X(i).toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="none" stroke="${C('--armedInk')}" stroke-width="1.6"><title>${esc(m.label)} entry ${m.date}</title></circle>`;
+    }else{
+      const col=(m.pnl||0)>=0?C('--gain'):C('--loss');
+      mk+=`<circle cx="${X(i).toFixed(1)}" cy="${y.toFixed(1)}" r="3.4" fill="${col}"><title>${esc(m.label)} exit ${m.date} ${money(m.pnl||0)} (${esc(m.reason||'')})</title></circle>`;
+    }
+  });
+
+  const last=a.length-1;
+  document.getElementById('equity').innerHTML=
+  `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Equity curve with trade markers">
+    <defs><linearGradient id="ge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${C('--accent')}" stop-opacity="${C('--areaTop')}"/>
+      <stop offset="100%" stop-color="${C('--accent')}" stop-opacity="0"/>
+    </linearGradient></defs>
+    ${grid}${ticks}${xl}
+    <path d="${area}" fill="url(#ge)"/>
+    <path d="${line(b)}" fill="none" stroke="${C('--slate')}" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <path d="${line(a)}" fill="none" stroke="${C('--line')}" stroke-width="2.4" stroke-linejoin="round"/>
+    ${mk}
+    <circle cx="${X(last)}" cy="${Y(a[last])}" r="4.5" fill="${C('--line')}"/>
+  </svg>`;
+}
+
+/* ---------- underwater ---------- */
+function drawUnderwater(){
+  const E=S.equity;
+  if(!E.drawdown||!E.drawdown.length){document.getElementById('underwater').innerHTML='';return}
+  const W=1000,H=200,P={t:16,r:18,b:34,l:52};
+  const d=E.drawdown, lo=Math.min(...d,-0.5);
+  const X=i=>P.l+i*(W-P.l-P.r)/Math.max(1,d.length-1);
+  const Y=v=>P.t+(0-v)*(H-P.t-P.b)/(0-lo);
+  const path=d.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' ');
+  const area=path+` L ${X(d.length-1).toFixed(1)} ${Y(0)} L ${X(0).toFixed(1)} ${Y(0)} Z`;
+  let grid='',ticks='';
+  for(let k=0;k<=3;k++){
+    const v=lo*k/3;
+    grid+=`<line x1="${P.l}" y1="${Y(v)}" x2="${W-P.r}" y2="${Y(v)}" stroke="${C('--gridline')}"/>`;
+    ticks+=`<text x="${P.l-10}" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="${C('--axis')}" font-family="JetBrains Mono,monospace">${v.toFixed(0)}%</text>`;
+  }
+  let xl='';
+  const step=Math.max(1,Math.floor(E.dates.length/5));
+  for(let i=0;i<E.dates.length;i+=step){
+    xl+=`<text x="${X(i)}" y="${H-11}" text-anchor="middle" font-size="11" fill="${C('--axis')}" font-family="Space Grotesk,sans-serif">${shortDate(E.dates[i])}</text>`;
+  }
+  document.getElementById('underwater').innerHTML=
+  `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Underwater drawdown curve">
+    ${grid}${ticks}${xl}
+    <path d="${area}" fill="${C('--loss')}" fill-opacity="${theme==='dark'?0.22:0.14}"/>
+    <path d="${path}" fill="none" stroke="${C('--loss')}" stroke-width="1.8"/>
+    <line x1="${P.l}" y1="${Y(0)}" x2="${W-P.r}" y2="${Y(0)}" stroke="${C('--zero')}"/>
+  </svg>`;
+}
+
+function ddStats(){
+  const d=S.drawdown_detail;
+  const w=document.getElementById('ddstat');
+  if(!d){w.innerHTML='<div><div class="k">No drawdown yet</div></div>';return}
+  const rows=[
+    ['Deepest',d.depth_pct.toFixed(2)+'%','dn'],
+    ['Currently',d.currently_underwater_pct.toFixed(2)+'%',d.currently_underwater_pct<0?'dn':'up'],
+    ['Decline',d.decline_days+'d',''],
+    [d.is_recovered?'Recovery':'Still down',d.recovery_days+'d',d.is_recovered?'':'wn'],
+    ['Trough',shortDate(d.trough_date),''],
+    ['Longest underwater',d.longest_underwater_days+'d','']
+  ];
+  w.innerHTML=rows.map(r=>
+    `<div><div class="k">${r[0]}</div><div class="v mono ${r[2]}">${r[1]}</div></div>`).join('');
+}
+
+/* ---------- positions ---------- */
+function positions(){
+  const t=document.getElementById('positions');
+  if(!S.positions.length){
+    t.outerHTML='<div class="err">No open positions. All instruments flat.</div>';return}
+  t.innerHTML=`<thead><tr>
+    <th>Instrument</th><th>Venue</th><th class="num">Qty</th>
+    <th class="num">Entry</th><th class="num">Last</th>
+    <th class="num">Unrealised</th><th class="num">%</th>
+    <th>Opened</th><th class="num">Held</th>
+    <th>Stop proximity</th><th>Expiry</th></tr></thead><tbody></tbody>`;
+  const tb=t.querySelector('tbody');
+  S.positions.forEach(p=>{
+    const hot=p.stop_proximity_pct>60?'hot':'';
+    let exp='<span style="color:var(--muted)">\u2013</span>';
+    if(p.days_to_expiry!=null){
+      const st=p.expiry_status;
+      const cls=st==='critical'?'tag crit':st==='warning'?'tag warn':'tag';
+      exp=`<span class="${cls}">${p.days_to_expiry}d</span>`;
+    }
+    tb.appendChild(el(`<tr>
+      <td class="sym">${esc(p.label)}</td>
+      <td style="color:var(--muted)">${esc(p.venue)}</td>
+      <td class="num mono">${p.quantity}</td>
+      <td class="num mono">${n(p.entry_price)}</td>
+      <td class="num mono">${n(p.current_price)}</td>
+      <td class="num mono ${dir(p.unrealised_pnl)}">${money(p.unrealised_pnl)}</td>
+      <td class="num mono ${dir(p.unrealised_pct)}">${pct(p.unrealised_pct)}</td>
+      <td class="mono" style="color:var(--muted)">${p.entry_date||'\u2013'}</td>
+      <td class="num mono">${p.holding_days!=null?p.holding_days+'d':'\u2013'}</td>
+      <td><span class="bar"><i class="${hot}" style="width:${p.stop_proximity_pct}%"></i></span><span class="mono" style="font-size:11px;color:var(--muted)">${p.stop_proximity_pct.toFixed(0)}%</span></td>
+      <td>${exp}</td></tr>`));
+  });
+}
+
+/* ---------- signals ---------- */
+function signals(){
+  const w=document.getElementById('signals');
+  S.signals.forEach(s=>{
+    const armed=s.state==='armed';
+    const tag=s.state==='long'?'<span class="tag long">Long</span>'
+      :s.state==='armed'?'<span class="tag" style="border-color:var(--armedBorder);color:var(--armedInk)">Armed</span>'
+      :s.state==='blocked'?'<span class="tag" style="border-color:var(--blockBorder);color:var(--loss)">RSI block</span>'
+      :'<span class="tag">Flat</span>';
+    let expNote='';
+    if(s.days_to_expiry!=null&&s.expiry_status!=='ok'){
+      expNote=`<span class="${s.expiry_status==='critical'?'dn':'wn'}">Roll in ${s.days_to_expiry}d</span>`;
+    }else if(s.inception_date){
+      expNote='<span>Since '+shortDate(s.inception_date)+'</span>';
+    }
+    w.appendChild(el(`<div class="scard ${armed?'armed':''}">
+      <div class="srow"><div class="sym">${esc(s.label)}</div>${tag}</div>
+      <div class="px mono">${n(s.price)}</div>
+      <div class="spread mono ${dir(s.spread_pct)}">${sgn(s.spread_pct)}${Math.abs(s.spread_pct).toFixed(2)}%</div>
+      <div class="slabel">EMA9 vs EMA21</div>
+      <div class="rsi">
+        <div class="rsitrack"><div class="rsiband"></div>
+          <div class="rsimark" style="left:${Math.min(100,Math.max(0,s.rsi))}%"></div></div>
+        <div class="rsifoot"><span>0</span><span class="mono" style="color:var(--ink)">RSI ${s.rsi.toFixed(1)}</span><span>100</span></div>
+      </div>
+      <div class="sfoot">${expNote||'<span></span>'}</div>
+    </div>`));
+  });
+}
+
+/* ---------- correlation ---------- */
+function correlation(){
+  const c=S.correlation;
+  const t=document.getElementById('corr');
+  if(!c.labels.length){t.innerHTML='';return}
+  const shade=v=>{
+    const a=Math.min(1,Math.abs(v));
+    const col=v>=0?C('--corrPos'):C('--corrNeg');
+    return `background:color-mix(in srgb, ${col} ${(a*76).toFixed(0)}%, transparent)`;
+  };
+  let h='<thead><tr><th></th>';
+  c.labels.forEach(l=>h+=`<th class="colh"><span>${esc(l)}</span></th>`);
+  h+='</tr></thead><tbody>';
+  c.matrix.forEach((row,i)=>{
+    h+=`<tr><th class="rowh">${esc(c.labels[i])}</th>`;
+    row.forEach((v,j)=>{
+      const self=i===j;
+      h+=`<td class="cell" style="${self?'':shade(v)};color:${Math.abs(v)>0.62?'#fff':'var(--muted)'}" title="${esc(c.labels[i])} vs ${esc(c.labels[j])}: ${v.toFixed(2)}">${self?'\u2013':v.toFixed(2).replace('0.','.')}</td>`;
+    });
+    h+='</tr>';
+  });
+  t.innerHTML=h+'</tbody>';
+
+  const ratio=c.effective_bets/c.instrument_count;
+  document.getElementById('corrstat').innerHTML=
+    `<div><div class="k">Effective bets</div><div class="v mono ${ratio<0.5?'wn':''}">${c.effective_bets.toFixed(2)}</div></div>
+     <div><div class="k">Instruments</div><div class="v mono">${c.instrument_count}</div></div>
+     <div><div class="k">Avg pairwise</div><div class="v mono">${c.avg_pairwise.toFixed(3)}</div></div>
+     <div><div class="k">Window</div><div class="v mono">${c.window_days}d</div></div>`;
+
+  const v=document.getElementById('corrverdict');
+  if(ratio<0.4){
+    v.innerHTML=`You hold <b>${c.instrument_count}</b> instruments but roughly <b>${c.effective_bets.toFixed(1)}</b> independent bets. Most of the basket is moving together, so the diversification is thinner than the position count suggests.`;
+  }else if(ratio<0.65){
+    v.innerHTML=`<b>${c.effective_bets.toFixed(1)}</b> independent bets from <b>${c.instrument_count}</b> instruments. Reasonable, though the equity cluster is doing much of the same work.`;
+  }else{
+    v.innerHTML=`<b>${c.effective_bets.toFixed(1)}</b> independent bets from <b>${c.instrument_count}</b> instruments. The basket is genuinely spread.`;
+  }
+}
+
+/* ---------- attribution ---------- */
+function attribution(){
+  const w=document.getElementById('attr');
+  if(!S.attribution.length){w.innerHTML='<div class="err">No closed trades yet.</div>';return}
+  const max=Math.max(...S.attribution.map(a=>Math.abs(a.pnl)))||1;
+  S.attribution.forEach(a=>{
+    const half=Math.abs(a.pnl)/max*50;
+    const style=a.pnl>=0?`left:50%;width:${half}%`:`right:50%;width:${half}%`;
+    w.appendChild(el(`<div class="arow">
+      <div class="sym">${esc(a.label)}</div>
+      <div class="atrack"><div class="azero" style="left:50%"></div>
+        <div class="${a.pnl<0?'neg':''}" style="position:absolute;top:0;bottom:0;border-radius:4px;background:${a.pnl<0?'var(--loss)':'var(--slate)'};${style}"></div></div>
+      <div class="num mono ${dir(a.pnl)}" style="text-align:right">${money(a.pnl)}</div>
+      <div class="mono" style="text-align:right;color:var(--muted);font-size:11px">${a.trades}t/${a.win_rate.toFixed(0)}%</div>
+    </div>`));
+  });
+}
+
+/* ---------- rolling charts ---------- */
+function miniLine(mount,dates,values,color,zeroLine,fmt){
+  if(!values.length){document.getElementById(mount).innerHTML='<div class="err" style="padding:20px">Not enough history yet.</div>';return}
+  const W=1000,H=210,P={t:16,r:16,b:34,l:52};
+  const lo=Math.min(...values,zeroLine!=null?zeroLine:Math.min(...values));
+  const hi=Math.max(...values,zeroLine!=null?zeroLine:Math.max(...values));
+  const pad=(hi-lo)*0.12||1, LO=lo-pad, HI=hi+pad;
+  const X=i=>P.l+i*(W-P.l-P.r)/Math.max(1,values.length-1);
+  const Y=v=>P.t+(HI-v)*(H-P.t-P.b)/(HI-LO);
+  let grid='',ticks='';
+  for(let k=0;k<=3;k++){
+    const v=LO+(HI-LO)*k/3;
+    grid+=`<line x1="${P.l}" y1="${Y(v)}" x2="${W-P.r}" y2="${Y(v)}" stroke="${C('--gridline')}"/>`;
+    ticks+=`<text x="${P.l-10}" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="${C('--axis')}" font-family="JetBrains Mono,monospace">${fmt(v)}</text>`;
+  }
+  let xl='';
+  const step=Math.max(1,Math.floor(dates.length/5));
+  for(let i=0;i<dates.length;i+=step){
+    xl+=`<text x="${X(i)}" y="${H-11}" text-anchor="middle" font-size="11" fill="${C('--axis')}" font-family="Space Grotesk,sans-serif">${shortDate(dates[i])}</text>`;
+  }
+  const path=values.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' ');
+  const zl=zeroLine!=null&&zeroLine>=LO&&zeroLine<=HI
+    ? `<line x1="${P.l}" y1="${Y(zeroLine)}" x2="${W-P.r}" y2="${Y(zeroLine)}" stroke="${C('--zero')}" stroke-dasharray="3 3"/>`:'';
+  document.getElementById(mount).innerHTML=
+    `<svg viewBox="0 0 ${W} ${H}">${grid}${ticks}${xl}${zl}
+      <path d="${path}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="${X(values.length-1)}" cy="${Y(values[values.length-1])}" r="4" fill="${color}"/></svg>`;
+}
+function drawRollingSharpe(){
+  const r=S.rolling.sharpe;
+  miniLine('rollsharpe',r.dates,r.values,C('--line'),0,v=>v.toFixed(1));
+}
+function drawRollingWin(){
+  const r=S.rolling.win_rate;
+  miniLine('rollwin',r.map(x=>x.date),r.map(x=>x.win_rate),C('--slate'),50,v=>v.toFixed(0)+'%');
+}
+
+/* ---------- durations ---------- */
+function drawDurations(){
+  const d=S.duration_histogram;
+  const W=1000,H=230,P={t:18,r:18,b:44,l:44};
+  const max=Math.max(...d.map(b=>b.total),1);
+  const bw=(W-P.l-P.r)/d.length;
+  const Y=v=>P.t+(max-v)*(H-P.t-P.b)/max;
+  let bars='',lbl='';
+  d.forEach((b,i)=>{
+    const x=P.l+i*bw+bw*0.18, w=bw*0.64;
+    const hW=(H-P.t-P.b)*(b.wins/max), hL=(H-P.t-P.b)*(b.losses/max);
+    if(b.losses) bars+=`<rect x="${x}" y="${Y(b.losses)}" width="${w}" height="${hL}" fill="${C('--loss')}" rx="3"><title>${b.bucket}: ${b.losses} losses</title></rect>`;
+    if(b.wins) bars+=`<rect x="${x}" y="${Y(b.losses+b.wins)}" width="${w}" height="${hW}" fill="${C('--armedBorder')}" rx="3"><title>${b.bucket}: ${b.wins} wins</title></rect>`;
+    lbl+=`<text x="${x+w/2}" y="${H-24}" text-anchor="middle" font-size="11" fill="${C('--axis')}" font-family="Space Grotesk,sans-serif">${b.bucket}</text>`;
+    lbl+=`<text x="${x+w/2}" y="${H-9}" text-anchor="middle" font-size="10" fill="${C('--axis')}" font-family="JetBrains Mono,monospace">${b.total?money(b.avg_pnl).replace(/\.\d+$/,''):''}</text>`;
+  });
+  let grid='';
+  for(let k=0;k<=3;k++){
+    const v=max*k/3;
+    grid+=`<line x1="${P.l}" y1="${Y(v)}" x2="${W-P.r}" y2="${Y(v)}" stroke="${C('--gridline')}"/>`;
+    grid+=`<text x="${P.l-10}" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="${C('--axis')}" font-family="JetBrains Mono,monospace">${Math.round(v)}</text>`;
+  }
+  document.getElementById('durations').innerHTML=
+    `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Holding period distribution">${grid}${bars}${lbl}</svg>`;
+}
+
+function tradeStats(){
+  const t=S.trade_stats;
+  document.getElementById('tradestat').innerHTML=[
+    ['Closed trades',t.count,''],
+    ['Avg holding',t.avg_holding_days+'d',''],
+    ['Avg win',money(t.avg_win),'up'],
+    ['Avg loss',money(-t.avg_loss),'dn'],
+    ['Profit factor',t.profit_factor??'\u221E',t.profit_factor>=1?'up':'dn'],
+    ['Expectancy',money(t.expectancy),dir(t.expectancy)]
+  ].map(r=>`<div><div class="k">${r[0]}</div><div class="v mono ${r[2]}">${r[1]}</div></div>`).join('');
+}
+
+/* ---------- suppression ---------- */
+function funnel(){
+  const s=S.suppression;
+  const taken=s.fill_rate, supp=100-taken;
+  document.getElementById('funnel').innerHTML=
+    `<div class="k" style="font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)">Crossovers fired</div>
+     <div class="mono" style="font-size:32px;letter-spacing:-.03em;margin-top:6px">${s.signals_fired}</div>
+     <div class="fbar"><i class="ftaken" style="width:${taken}%"></i><i class="fsupp" style="width:${supp}%"></i></div>
+     <div class="fleg"><span class="mono">${s.entries_taken} taken \u00B7 ${s.fill_rate}%</span><span class="mono">${s.suppressed} vetoed</span></div>
+     <div class="note" style="margin-top:14px">${
+       s.fill_rate<55
+       ? 'RSI is vetoing nearly half the crossovers. Worth ablating the RSI filter in backtest to see whether it adds alpha or just removes trades.'
+       : 'RSI is filtering a minority of crossovers.'}</div>`;
+}
+function suppTable(){
+  const t=document.getElementById('supptable');
+  const by=S.suppression.by_label||{};
+  const rows=Object.entries(by).sort((a,b)=>b[1]-a[1]);
+  if(!rows.length){t.outerHTML='<div class="err">No suppressed signals.</div>';return}
+  t.style.minWidth='auto';
+  t.innerHTML='<thead><tr><th>Instrument</th><th class="num">Vetoed</th></tr></thead><tbody>'+
+    rows.map(r=>`<tr><td class="sym">${esc(r[0])}</td><td class="num mono">${r[1]}</td></tr>`).join('')+
+    '</tbody>';
+}
+
+/* ---------- health ---------- */
+function health(){
+  const w=document.getElementById('health');
+  if(!S.health.length){w.innerHTML='<div class="err">No warnings or errors recorded.</div>';return}
+  S.health.forEach(h=>{
+    w.appendChild(el(`<div class="hrowe">
+      <div><span class="lvl ${esc(h.level)}">${esc(h.level)}</span></div>
+      <div class="mono hdate" style="color:var(--muted);font-size:11.5px">${esc(h.label)}</div>
+      <div class="hmsg">${esc(h.message)}</div></div>`));
+  });
+}
+
+/* ---------- closed trades ---------- */
+function closed(){
+  const t=document.getElementById('closed');
+  if(!S.closed_trades.length){t.outerHTML='<div class="err">No closed trades yet.</div>';return}
+  const nice={stop:'Stop hit',crossover:'Crossover reversal',rsi_exit:'RSI below 40',manual:'Manual',roll:'Contract roll'};
+  t.innerHTML=`<thead><tr>
+    <th>Instrument</th><th>Side</th><th>Opened</th><th>Closed</th>
+    <th class="num">Held</th><th class="num">Entry</th><th class="num">Exit</th>
+    <th class="num">P&amp;L</th><th class="num">%</th><th>Exit reason</th></tr></thead><tbody></tbody>`;
+  const tb=t.querySelector('tbody');
+  S.closed_trades.forEach(c=>{
+    tb.appendChild(el(`<tr>
+      <td class="sym">${esc(c.label)}</td>
+      <td style="color:var(--muted)">${esc(c.direction)}</td>
+      <td class="mono" style="color:var(--muted)">${esc(c.entry_date)}</td>
+      <td class="mono" style="color:var(--muted)">${esc(c.exit_date)}</td>
+      <td class="num mono">${c.holding_days}d</td>
+      <td class="num mono">${n(c.entry_price)}</td>
+      <td class="num mono">${n(c.exit_price)}</td>
+      <td class="num mono ${dir(c.pnl)}">${money(c.pnl)}</td>
+      <td class="num mono ${dir(c.pnl_pct)}">${pct(c.pnl_pct)}</td>
+      <td style="color:var(--muted)">${esc(nice[c.reason]||c.reason)}</td></tr>`));
+  });
+}
+
+function foot(){
+  document.getElementById('footnote').textContent =
+    S.mode==='paper'
+    ? 'Paper trading. Fills are simulated and exclude slippage and commission, so live results will be worse.'
+    : 'Live capital.';
+  document.getElementById('footstamp').textContent='state.json \u00B7 '+S.generated_at;
+}
+
+/* ---------- theme wiring ---------- */
+function redraw(){drawEquity();drawUnderwater();drawRollingSharpe();drawRollingWin();drawDurations();correlation();}
+function wireTheme(){
+  document.getElementById('themebtn').addEventListener('click',()=>{
+    theme=theme==='dark'?'light':'dark';
+    localStorage.setItem(TK,theme); applyTheme(theme); redraw();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',e=>{
+    if(localStorage.getItem(TK))return;
+    theme=e.matches?'dark':'light'; applyTheme(theme); redraw();
+  });
+}
+function reveal(){
+  const nodes=document.querySelectorAll('.revealable');
+  if(!matchMedia('(prefers-reduced-motion: no-preference)').matches){
+    nodes.forEach(n=>n.classList.add('in'));return}
+  const io=new IntersectionObserver(es=>es.forEach(e=>{
+    if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.06});
+  nodes.forEach(n=>io.observe(n));
+}
+</script>
+</body>
+</html>

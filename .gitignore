@@ -1,0 +1,9 @@
+email_config.py
+telegram_config.py
+*_position_state.json
+position_ownership.json
+inception.json
+*_trade_log.txt
+*.jsonl
+__pycache__/
+.DS_Store

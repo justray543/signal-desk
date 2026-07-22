@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-07-22T23:33:10",
+  "generated_at": "2026-07-22T23:46:39",
   "mode": "paper",
   "currency": "USD",
   "inception": {
-    "date": "2026-07-22",
+    "date": "2026-07-20",
     "starting_capital": 1000000.0,
-    "days_live": 0
+    "days_live": 2
   },
   "performance": {
-    "nav": 1018784.53,
+    "nav": 1018868.36,
     "return_pct": 0.0,
     "cagr_pct": 0.0,
     "sharpe": 0.0,
@@ -251,19 +251,115 @@
     }
   ],
   "suppression": {
-    "signals_fired": 5,
+    "signals_fired": 6,
     "entries_taken": 0,
-    "suppressed": 5,
+    "suppressed": 6,
     "fill_rate": 0.0,
     "by_reason": {
-      "rsi_overbought": 5
+      "rsi_overbought": 6
     },
     "by_label": {
-      "HSI": 5
+      "HSI": 6
     }
   },
   "closed_trades": [],
   "health": [
+    {
+      "event": "health",
+      "level": "warning",
+      "label": "NKD",
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T23:46:22",
+      "message": "position (1.0) not tracked locally, treating as MANUAL. Bot will not auto-sell it."
+    },
+    {
+      "event": "health",
+      "level": "warning",
+      "label": "DAX",
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T23:46:17",
+      "message": "position (1.0) not tracked locally, treating as MANUAL. Bot will not auto-sell it."
+    },
+    {
+      "event": "health",
+      "level": "warning",
+      "label": "NQ",
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T23:46:11",
+      "message": "position (1.0) not tracked locally, treating as MANUAL. Bot will not auto-sell it."
+    },
+    {
+      "event": "health",
+      "level": "error",
+      "label": "SYSTEM",
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T23:45:58",
+      "message": "NetLiquidation read failed: 'NetLiquidation'"
+    },
+    {
+      "event": "health",
+      "level": "warning",
+      "label": "HSI",
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T23:45:56",
+      "message": "insufficient data, skipped"
+    },
+    {
+      "event": "health",
+      "level": "warning",
+      "label": "SOXX",
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T23:45:51",
+      "message": "insufficient data, skipped"
+    },
+    {
+      "event": "health",
+      "level": "warning",
+      "label": "NKD",
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T23:45:46",
+      "message": "insufficient data, skipped"
+    },
+    {
+      "event": "health",
+      "level": "warning",
+      "label": "NKD",
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T23:45:40",
+      "message": "STATE MISMATCH - local file says position open, broker shows none. Resetting to flat."
+    },
+    {
+      "event": "health",
+      "level": "warning",
+      "label": "DAX",
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T23:45:40",
+      "message": "insufficient data, skipped"
+    },
+    {
+      "event": "health",
+      "level": "warning",
+      "label": "DAX",
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T23:45:35",
+      "message": "STATE MISMATCH - local file says position open, broker shows none. Resetting to flat."
+    },
+    {
+      "event": "health",
+      "level": "warning",
+      "label": "NQ",
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T23:45:35",
+      "message": "insufficient data, skipped"
+    },
+    {
+      "event": "health",
+      "level": "warning",
+      "label": "NQ",
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T23:45:30",
+      "message": "STATE MISMATCH - local file says position open, broker shows none. Resetting to flat."
+    },
     {
       "event": "health",
       "level": "warning",
@@ -367,92 +463,12 @@
       "date": "2026-07-22",
       "timestamp": "2026-07-22T20:28:19",
       "message": "insufficient data, skipped"
-    },
-    {
-      "event": "health",
-      "level": "warning",
-      "label": "NKD",
-      "date": "2026-07-22",
-      "timestamp": "2026-07-22T20:28:14",
-      "message": "insufficient data, skipped"
-    },
-    {
-      "event": "health",
-      "level": "warning",
-      "label": "DAX",
-      "date": "2026-07-22",
-      "timestamp": "2026-07-22T20:28:09",
-      "message": "insufficient data, skipped"
-    },
-    {
-      "event": "health",
-      "level": "warning",
-      "label": "NQ",
-      "date": "2026-07-22",
-      "timestamp": "2026-07-22T20:28:04",
-      "message": "insufficient data, skipped"
-    },
-    {
-      "event": "health",
-      "level": "error",
-      "label": "SYSTEM",
-      "date": "2026-07-22",
-      "timestamp": "2026-07-22T20:27:40",
-      "message": "NetLiquidation read failed: 'NetLiquidation'"
-    },
-    {
-      "event": "health",
-      "level": "warning",
-      "label": "HSI",
-      "date": "2026-07-22",
-      "timestamp": "2026-07-22T20:27:37",
-      "message": "insufficient data, skipped"
-    },
-    {
-      "event": "health",
-      "level": "warning",
-      "label": "HSI",
-      "date": "2026-07-22",
-      "timestamp": "2026-07-22T20:27:32",
-      "message": "STATE MISMATCH - local file says position open, broker shows none. Resetting to flat."
-    },
-    {
-      "event": "health",
-      "level": "warning",
-      "label": "SOXX",
-      "date": "2026-07-22",
-      "timestamp": "2026-07-22T20:27:32",
-      "message": "insufficient data, skipped"
-    },
-    {
-      "event": "health",
-      "level": "warning",
-      "label": "NKD",
-      "date": "2026-07-22",
-      "timestamp": "2026-07-22T20:27:27",
-      "message": "insufficient data, skipped"
-    },
-    {
-      "event": "health",
-      "level": "warning",
-      "label": "DAX",
-      "date": "2026-07-22",
-      "timestamp": "2026-07-22T20:27:22",
-      "message": "insufficient data, skipped"
-    },
-    {
-      "event": "health",
-      "level": "warning",
-      "label": "NQ",
-      "date": "2026-07-22",
-      "timestamp": "2026-07-22T20:27:17",
-      "message": "insufficient data, skipped"
     }
   ],
   "last_run": {
     "event": "run",
     "date": "2026-07-22",
-    "timestamp": "2026-07-22T23:33:10",
+    "timestamp": "2026-07-22T23:46:39",
     "status": "ok",
     "instruments_checked": 5,
     "errors": 0

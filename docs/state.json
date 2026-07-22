@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-23T00:02:34",
+  "generated_at": "2026-07-23T00:08:23",
   "mode": "paper",
   "currency": "USD",
   "inception": {
@@ -10,11 +10,14 @@
   "performance": {
     "nav": 1016667.12,
     "return_pct": 1.67,
-    "cagr_pct": -72.91,
-    "sharpe": 0.0,
-    "sortino": 0.0,
-    "volatility_pct": 0.0,
-    "max_drawdown_pct": -0.36
+    "pnl_abs": 16667.12,
+    "history_points": 2,
+    "max_drawdown_pct": -0.36,
+    "sharpe": null,
+    "sortino": null,
+    "volatility_pct": null,
+    "cagr_pct": null,
+    "min_points_risk": 20
   },
   "equity": {
     "dates": [
@@ -75,10 +78,10 @@
       "venue": "EUREX",
       "quantity": 1,
       "entry_price": 25271.08,
-      "current_price": 25272.0,
+      "current_price": 25274.0,
       "stop_price": 0.0,
-      "unrealised_pnl": 23.0,
-      "unrealised_pct": 0.0,
+      "unrealised_pnl": 73.0,
+      "unrealised_pct": 0.01,
       "entry_date": null,
       "holding_days": null,
       "stop_proximity_pct": 0.0,
@@ -116,11 +119,11 @@
     },
     {
       "label": "DAX",
-      "price": 25272.0,
-      "ema9": 25140.53,
-      "ema21": 25160.15,
-      "rsi": 40.29,
-      "spread_pct": -0.078,
+      "price": 25274.0,
+      "ema9": 25140.93,
+      "ema21": 25160.33,
+      "rsi": 40.34,
+      "spread_pct": -0.077,
       "state": "long",
       "days_to_expiry": 69,
       "expiry_status": "ok",
@@ -273,15 +276,15 @@
     }
   ],
   "suppression": {
-    "signals_fired": 7,
+    "signals_fired": 8,
     "entries_taken": 0,
-    "suppressed": 7,
+    "suppressed": 8,
     "fill_rate": 0.0,
     "by_reason": {
-      "rsi_overbought": 7
+      "rsi_overbought": 8
     },
     "by_label": {
-      "HSI": 7
+      "HSI": 8
     }
   },
   "closed_trades": [],
@@ -490,7 +493,7 @@
   "last_run": {
     "event": "run",
     "date": "2026-07-23",
-    "timestamp": "2026-07-23T00:02:34",
+    "timestamp": "2026-07-23T00:08:23",
     "status": "ok",
     "instruments_checked": 5,
     "errors": 0
